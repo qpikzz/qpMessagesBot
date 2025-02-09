@@ -147,9 +147,17 @@ def sendMessage(message, recip):
         elif message.content_type == "photo":
             fileId = message.photo[-1].file_id
             if user.username:
-                bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name} (@{user.username}):", reply_markup=k)
+                if message.caption:
+                   bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name} (@{user.username}).\n🗞 Подпись к фото: <code><blockquote>{message.caption}</code></blockquote>"[0:2000], reply_markup=k) 
+                else:
+                    bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name} (@{user.username}):", reply_markup=k)
+                
             else:
-                bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name}:", reply_markup=k)
+                if message.caption:
+                   bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name}.\n🗞 Подпись к фото: <code><blockquote>{message.caption}</code></blockquote>"[0:2000], reply_markup=k) 
+                else:
+                    bot.send_photo(recip, fileId, caption=f"💾 Новое фото от {first_name} {last_name}:", reply_markup=k)
+
             bot.reply_to(message, "💾 Фото отправлено!\n\n⏱ Ожидайте ответ.")
 
         elif message.content_type == "video":
@@ -158,9 +166,17 @@ def sendMessage(message, recip):
 
             fileId = message.video.file_id
             if user.username:
-                bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name} (@{user.username}):", reply_markup=k)
+                if message.caption:
+                   bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name} (@{user.username}).\n🗞 Подпись к видео: <code><blockquote>{message.caption}</code></blockquote>"[0:2000], reply_markup=k) 
+                else:
+                    bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name} (@{user.username}):", reply_markup=k)
+                
             else:
-                bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name}:", reply_markup=k)
+                if message.caption:
+                   bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name}.\n🗞 Подпись к видео: <code><blockquote>{message.caption}</code></blockquote>"[0:2000], reply_markup=k) 
+                else:
+                    bot.send_video(recip, fileId, caption=f"🎞 Новое видео от {first_name} {last_name}:", reply_markup=k)
+            
             bot.reply_to(message, "🎞 Видео отправлено!\n\n⏱ Ожидайте ответ.")
 
         else:
@@ -192,6 +208,11 @@ def answer(call):
     bot.send_message(call.message.chat.id,f"💭 Напиши ответное сообщение!\n\n🎞 Ты можешь отправить обычный текст, голосовое, кружок, фото или видео!\n\n🚫 Если ты передумал(а), напиши \"<code>Отмена</code>\"")
     bot.register_next_step_handler(call.message, lambda msg: sendMessage(msg, recip))
 
+
+# Обработка команды "/privacy"
+@bot.message_handler(commands=["privacy"])
+def privacy(message):
+    bot.reply_to(message,"1. Собираемые данные:\n1.1. ID вашего аккаунта в зашифрованном виде – это необходимо для стабильной работы бота (чтобы нельзя было отправлять сообщения тем, кто не запустил бота).\n\n2. Мы не видим, не храним и не анализируем данные, не указанные в пункте 1, а также сообщения, отправляемые другим пользователям.\n\n3. Пользователь, которому вы отправляете сообщение, видит:\n3.1. Ваше имя, указанное в Telegram;\n3.2. Вашу фамилию, указанную в Telegram (при наличии);\n3.3. Ваш юзернейм (при наличии).")
 
 # Запуск бота
 print("Бот запущен!")
