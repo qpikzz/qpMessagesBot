@@ -11,7 +11,7 @@ import os
 
 
 # Создание бота
-token = "¯\_(ツ)_/¯"
+token = "(^・ω・^ )"
 bot = telebot.TeleBot(token, parse_mode="html")
 
 
@@ -35,6 +35,7 @@ def start(message):
     chat = message.chat
     user = message.from_user
     text = message.text
+    text = text.replace("<", "&lt;").replace(">", "&gt;")
 
     # Добавить пользователя в Users.txt, если его там нет
     with open("users.txt","r", encoding="utf-8") as file:
@@ -81,6 +82,11 @@ def sendMessage(message, recip):
     user = message.from_user
     first_name = user.first_name if user.first_name else ""
     last_name = user.last_name if user.last_name else ""
+
+    if message.text:
+        message.text = message.text.replace("<", "&lt;").replace(">", "&gt;")
+    if message.caption:
+        message.caption = message.caption.replace("<", "&lt;").replace(">", "&gt;")
     
     # Создание маркапа
     k = InlineKeyboardMarkup()
@@ -195,6 +201,7 @@ def sendMessage(message, recip):
 # Обработка нажатия кнопки "Игнорировать"
 @bot.callback_query_handler(func=lambda call: call.data == "ignore")
 def ignore(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
     try:
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.id)
     except ApiTelegramException:
@@ -204,6 +211,7 @@ def ignore(call):
 # Нажатие кнопки "Ответить"
 @bot.callback_query_handler(func=lambda call: "answer" in call.data)
 def answer(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
     recip = call.data.split()[1]
     bot.send_message(call.message.chat.id,f"💭 Напиши ответное сообщение!\n\n🎞 Ты можешь отправить обычный текст, голосовое, кружок, фото или видео!\n\n🚫 Если ты передумал(а), напиши \"<code>Отмена</code>\"")
     bot.register_next_step_handler(call.message, lambda msg: sendMessage(msg, recip))
