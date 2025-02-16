@@ -12,7 +12,7 @@ import os
 
 
 # Создание бота
-token = "⚆_⚆"
+token = ":D"
 bot = telebot.TeleBot(token, parse_mode="html")
 admin = 19
 
@@ -36,8 +36,13 @@ def start(message):
     # Часто используемые переменные
     chat = message.chat
     user = message.from_user
-    text = message.text
+    text = message.text 
     text = text.replace("<", "&lt;").replace(">", "&gt;")
+
+    # Проверка на то, что бот запущен в лс
+    if chat.type != "private":
+        bot.send_message(chat.id,"🥹 Спасибо за добавление бота в группу / канал!\n❗ Во избежание потенциальных ошибок, используйте данную команду в ЛС!\n👉 @qpMessagesBot")
+        return None
 
     # Добавить пользователя в Users.txt, если его там нет
     with open("users.txt","r", encoding="utf-8") as file:
@@ -75,6 +80,8 @@ def start(message):
 
         bot.send_message(chat.id,f"💭 Теперь напиши сообщение!\n\n🎞 Ты можешь отправить обычный текст, голосовое, кружок, фото или видео!\n\n🚫 Если ты передумал(а), напиши \"<code>Отмена</code>\"")
         bot.register_next_step_handler(message, lambda msg: sendMessage(msg, recip))
+
+
 
 # Отправка сообщений
 def sendMessage(message, recip):
@@ -288,17 +295,20 @@ def reaction(call):
 def privacy(message):
     bot.reply_to(message,"1. Собираемые данные:\n1.1. ID вашего аккаунта в зашифрованном виде – это необходимо для стабильной работы бота (чтобы нельзя было отправлять сообщения тем, кто не запустил бота).\n\n2. Мы не видим, не храним и не анализируем данные, не указанные в пункте 1, а также сообщения, отправляемые другим пользователям.\n\n3. Пользователь, которому вы отправляете сообщение, видит:\n3.1. Ваше имя, указанное в Telegram;\n3.2. Вашу фамилию, указанную в Telegram (при наличии);\n3.3. Ваш юзернейм (при наличии).")
 
+
+
+# Обработка команды "/post"
 @bot.message_handler(commands=["post"])
 def post(message):
     if message.from_user.id != admin:
-        print("sosle")
+        print(":(")
         return None
     with open("users.txt","r", encoding="utf-8") as file:
         users = json.load(file)
     
     for user in users:
         try:
-            bot.send_message(decode(user), f"📰 Новое уведомление:\n{message.text}")
+            bot.send_message(decode(user), f"📰 Новое уведомление:\n{" ".join(message.text.split(" ")[1:])}")
         except ApiTelegramException:
             try:
                 with open("users.txt","r", encoding="utf-8") as file:
@@ -312,4 +322,8 @@ def post(message):
 
 # Запуск бота
 print("Бот запущен!")
-bot.polling(non_stop=True)
+while True:
+    try:
+        bot.polling(non_stop=True)
+    except Exception as e:
+        print(f"Интернет пал :(")
